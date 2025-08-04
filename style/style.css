@@ -182,5 +182,13 @@ footer a:hover{
     .nav-links{
         display: none;
     }
-    
+    .footer-links{
+        flex-direction: column;
+        gap: 10px;
+    }
+    .footer-links li {
+        font-size: 1.25rem;
+        padding-left: 0px;
+        border-left: none;
+    }
 }
