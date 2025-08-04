@@ -1,0 +1,121 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+/* Shared Style  */
+body {
+  background-color: #ff6500;
+  font-family: "Rubik", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}
+.section-wide {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.section-top{
+    margin-top: 60px;
+}
+
+
+/* Nav Section  */
+nav{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #ffffff50;
+    backdrop-filter: blur(10px);
+    padding: 20px 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+#marTop {
+    margin-top: 20px;
+}
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.logo figure {
+    height: 80px;
+    width: 80px;
+    background-color: #1E3E62;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+}
+.logo img {
+    height: 50px;
+    width: 50px;
+}
+.logo-text{
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1E3E62;
+}
+.nav-links{
+    display: flex;
+    list-style: none;
+    gap: 20px;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1E3E62;
+}
+.nav-links a{
+    text-decoration: none;
+    color: #1E3E62;
+}
+.nav-links a:hover {
+    text-decoration: underline;
+    color: #F7374F;
+}
+ul img{
+    rotate: 130deg;
+}
+ul img:hover{
+    cursor: pointer;
+}
+
+/* Footer Section  */
+footer{
+    text-align: center;
+}
+.footer-links{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1E3E62;
+}
+.footer-links li{
+    list-style: none;
+    
+}
+.borderLeft{
+    border-left: 3px solid #1E3E62;
+    padding-left: 20px;
+}
+.footer-links a{
+    text-decoration: none;
+    color: #1E3E62;
+}
+footer hr{
+    background-color: #1E3E62;
+    height: 3px;
+    border: none;
+    margin: 15px 350px;
+}
+footer p{
+    font-size: 0.90rem;
+    font-weight: 800;
+    color: #1E3E62;
+}
+footer a:hover{
+    text-decoration: underline;
+}
