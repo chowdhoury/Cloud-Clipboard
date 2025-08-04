@@ -30,6 +30,9 @@ nav{
     border-radius: 15px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
+.menu-icon {
+    display: none;
+}
 #marTop {
     margin-top: 20px;
 }
@@ -57,7 +60,7 @@ nav{
     font-weight: 800;
     color: #1E3E62;
 }
-.nav-links{
+.nav-links,.mobile-menu{
     display: flex;
     list-style: none;
     gap: 20px;
@@ -65,7 +68,7 @@ nav{
     font-weight: 600;
     color: #1E3E62;
 }
-.nav-links a{
+.nav-links a,.mobile-menu a{
     text-decoration: none;
     color: #1E3E62;
 }
@@ -73,12 +76,47 @@ nav{
     text-decoration: underline;
     color: #F7374F;
 }
-ul img{
+.rotateImg{
     rotate: 130deg;
 }
 ul img:hover{
     cursor: pointer;
 }
+.mobile-menu{
+    flex-direction: column;
+    position: fixed;
+    width: 100%;
+    background-color: #ffffff70;
+    top: 0;
+    height: 100vh;
+    display: none;
+    backdrop-filter: blur(10px);
+    z-index: 999;
+    padding-top: 20px;
+}
+.mobile-menu li,
+.mobile-menu a {
+    width: 100%;
+}
+.mobile-menu li{
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 800;
+}
+.mobile-menu img {
+    width: 50px;
+    height: 50px;
+    margin: 20px auto;
+}
+.control{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+
 
 /* Footer Section  */
 footer{
@@ -118,4 +156,30 @@ footer p{
 }
 footer a:hover{
     text-decoration: underline;
+}
+
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+    nav{
+        /* flex-direction: column; */
+        align-items: center;
+        padding: 10px;
+    }
+    #marTop {
+        margin-top: 20px;
+    }
+    .menu-icon {
+        display: inline-block;
+        cursor: pointer;
+        width: 50px;
+        height: 50px;
+    }
+    .logo-text {
+        font-size: 1.5rem;
+    }
+    .nav-links{
+        display: none;
+    }
+    
 }
