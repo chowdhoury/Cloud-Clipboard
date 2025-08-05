@@ -118,6 +118,21 @@ ul img:hover{
 }
 
 
+/* Hero Section */
+.image-section{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.image-section img{
+    max-width: 350px;
+    filter: drop-shadow(10px 4px 10px rgba(0, 0, 0, 0.2));
+}
+
+
+
+
+
 
 /* Footer Section  */
 footer{
@@ -148,7 +163,8 @@ footer hr{
     background-color: #1E3E62;
     height: 3px;
     border: none;
-    margin: 15px 350px;
+    margin: 15px auto;
+    max-width: 500px;
 }
 footer p{
     font-size: 0.90rem;
@@ -185,10 +201,14 @@ footer a:hover{
     .footer-links{
         flex-direction: column;
         gap: 10px;
+        margin-bottom: 20px;
     }
     .footer-links li {
         font-size: 1.25rem;
         padding-left: 0px;
         border-left: none;
+    }
+    hr{
+        display: none;
     }
 }
