@@ -116,6 +116,9 @@ ul img:hover{
     padding-left: 20px;
     padding-right: 20px;
 }
+#mainContent{
+    margin-bottom: 60px;
+}
 
 
 /* Hero Section */
@@ -129,14 +132,96 @@ ul img:hover{
     filter: drop-shadow(10px 4px 10px rgba(0, 0, 0, 0.2));
 }
 
+/* Functional Section  */
+.functional-section .text-section{
+    text-align: center;
+    justify-items: center;
+}
+.text-section h1{
+    font-size: 2.75rem;
+    font-weight: 800;
+    color: #1E3E62;
+}
+.text-section p{
+    margin-top: 10px;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1E3E62;
+    max-width: 600px;
+    text-align: center;
+}
 
+/* Functional Buttons */
+.functional-buttons{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 40px;
+    gap: 64px;
+}
+.functional-buttons p{
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1E3E62;
+    margin-bottom: 10px;
+}
+.primary-button{
+    width: 400px;
+    /* width: 100%; */
+    padding: 15px 20px;
+    background-color: #ffffff50;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1E3E62;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, transform 0.3s ease
+}
+.input-container{
+    display: flex;
+}
+.input-container input{
+    width: 250px;
+    padding: 15px 20px;
+    border: none;
+    border-radius: 5px 0px 0px 5px;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1E3E62;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 
-
-
+}
+.input-container input::placeholder{
+    color: #1e3e626b;
+    font-size: 1.25rem;
+}
+.input-container input:focus{
+    outline: none;
+}
+.secondary-button{
+    width: 150px;
+    padding: 15px 20px;
+    background-color: #ffffff50;
+    border: none;
+    border-radius: 0px 5px 5px 0px;
+    cursor: pointer;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1E3E62;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, transform 0.3s ease
+}
+.primary-button:hover, .secondary-button:hover {
+    background-color: #ffffff90;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
 
 /* Footer Section  */
 footer{
     text-align: center;
+    padding-bottom: 20px;
 }
 .footer-links{
     display: flex;
@@ -210,5 +295,12 @@ footer a:hover{
     }
     hr{
         display: none;
+    }
+    .functional-section{
+        padding: 0 10px;
+    }
+    .functional-buttons{
+        flex-direction: column;
+        gap: 30px;
     }
 }

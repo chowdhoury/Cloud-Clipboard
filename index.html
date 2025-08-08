@@ -53,9 +53,30 @@
         </nav>
     </header>
 
-    <main>
-        <section class="section-wide section-top image-section">
-            <img src="./asset/clipboard.webp" alt="">
+    <main id="mainContent">
+        <section class="section-wide image-section">
+            <!-- <img src="./asset/clipboard.webp" alt=""> -->
+            <script src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.6.2/dist/dotlottie-wc.js" type="module"></script>
+            <dotlottie-wc src="https://lottie.host/c7363849-bc39-47c9-88f2-4bc27afb42cf/UVGh4V7fib.lottie" style="max-width: 400px;height: 400px" speed="1" autoplay loop></dotlottie-wc>
+        </section>
+        <section class="section-wide functional-section">
+            <div class="text-section">
+                <h1>Cloud Clipboard</h1>
+                <p>Share text and images instantly with Cloud Clipboard. No sign-up required, just copy and paste!</p>
+            </div>
+            <div class="functional-buttons">
+                <div>
+                    <p>Create a new Clipboard...</p>
+                    <button class="primary-button">Create Clipboard</button>
+                </div>
+                <div>
+                    <p>Join an existing Clipboard...</p>
+                    <div class="input-container">
+                        <input type="text" placeholder="Enter Clipboard ID">
+                        <button class="secondary-button">Join</button>
+                    </div>
+                </div>
+            </div>
         </section>
     </main>
     <footer class="section-wide section-top">
