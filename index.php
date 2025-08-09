@@ -1,12 +1,43 @@
 <?php
-    $error              = "";
-    $clipboard_id_value = "";
+// filepath: d:\Programming\Web Programming 2.0\Course_Project\index.php
+require_once 'config/database.php';
 
-    if ($_SERVER["REQUEST_METHOD"] === "POST") {
+$error = "";
+$clipboard_id_value = "";
+
+// Function to generate unique clipboard ID
+function generateUniqueClipboardId($pdo) {
+    do {
+        $clipboard_id = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM clipboards WHERE clipboard_id = ?");
+        $stmt->execute([$clipboard_id]);
+        $exists = $stmt->fetchColumn() > 0;
+    } while ($exists);
+    
+    return $clipboard_id;
+}
+
+// Function to clean expired entries
+function cleanExpiredEntries($pdo) {
+    $stmt = $pdo->prepare("DELETE FROM clipboards WHERE expires_at < NOW()");
+    $stmt->execute();
+}
+
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    try {
+        $database = new Database();
+        $pdo = $database->getConnection();
+        
+        // Clean expired entries
+        cleanExpiredEntries($pdo);
+        
         // Handle generate button
         if (isset($_POST['generate'])) {
-            // Generate a random 6-digit number with leading zeros if needed
-            $clipboard_id_value = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+            $clipboard_id_value = generateUniqueClipboardId($pdo);
+            
+            // Insert new clipboard entry
+            $stmt = $pdo->prepare("INSERT INTO clipboards (clipboard_id, content_type) VALUES (?, 'empty')");
+            $stmt->execute([$clipboard_id_value]);
             
             header("Location: content.php?clipboard_id=" . urlencode($clipboard_id_value));
             exit;
@@ -20,14 +51,24 @@
             if (!preg_match('/^\d{6}$/', $clipboard_id_value)) {
                 $error = "Invalid ID. Must be a 6-digit number.";
             } else {
-                // Redirect to content.php with the clipboard ID
-                header("Location: content.php?clipboard_id=" . urlencode($clipboard_id_value));
-                exit;
+                // Check if clipboard exists in database
+                $stmt = $pdo->prepare("SELECT clipboard_id FROM clipboards WHERE clipboard_id = ? AND expires_at > NOW()");
+                $stmt->execute([$clipboard_id_value]);
+                
+                if ($stmt->rowCount() > 0) {
+                    header("Location: content.php?clipboard_id=" . urlencode($clipboard_id_value));
+                    exit;
+                } else {
+                    $error = "Clipboard not found or has expired.";
+                }
             }
         } else {
             $error = "Please enter a clipboard ID.";
         }
+    } catch (Exception $e) {
+        $error = "Database error: " . $e->getMessage();
     }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -90,7 +131,6 @@
 
     <main id="mainContent">
         <section class="section-wide image-section">
-            <!-- <img src="./asset/clipboard.webp" alt=""> -->
             <script src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.6.2/dist/dotlottie-wc.js" type="module"></script>
             <dotlottie-wc src="https://lottie.host/c7363849-bc39-47c9-88f2-4bc27afb42cf/UVGh4V7fib.lottie"
                 style="max-width: 400px;height: 400px" speed="1" autoplay loop></dotlottie-wc>

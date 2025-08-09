@@ -1,0 +1,155 @@
+<?php
+// filepath: d:\Programming\Web Programming 2.0\Course_Project\content.php
+require_once 'config/database.php';
+
+$clipboard_id = isset($_GET['clipboard_id']) ? $_GET['clipboard_id'] : '';
+$clipboard_data = null;
+$error = '';
+
+if ($clipboard_id) {
+    try {
+        $database = new Database();
+        $pdo = $database->getConnection();
+        
+        // Get clipboard data
+        $stmt = $pdo->prepare("SELECT * FROM clipboards WHERE clipboard_id = ? AND expires_at > NOW()");
+        $stmt->execute([$clipboard_id]);
+        $clipboard_data = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$clipboard_data) {
+            $error = "Clipboard not found or has expired.";
+        }
+    } catch (Exception $e) {
+        $error = "Database error: " . $e->getMessage();
+    }
+}
+
+// Handle AJAX requests for saving data
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    header('Content-Type: application/json');
+    
+    try {
+        $database = new Database();
+        $pdo = $database->getConnection();
+        
+        if (isset($_POST['text'])) {
+            $text = $_POST['text'];
+            $stmt = $pdo->prepare("UPDATE clipboards SET content_type = 'text', content_text = ? WHERE clipboard_id = ?");
+            $stmt->execute([$text, $clipboard_id]);
+            echo json_encode(['success' => true]);
+        }
+        
+        if (isset($_FILES['file']) && $_FILES['file']['error'] == 0) {
+            $uploadDir = "uploads/";
+            if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
+            
+            $fileName = time() . "_" . basename($_FILES['file']['name']);
+            $filePath = $uploadDir . $fileName;
+            
+            if (move_uploaded_file($_FILES['file']['tmp_name'], $filePath)) {
+                $stmt = $pdo->prepare("UPDATE clipboards SET content_type = 'file', file_name = ?, file_path = ? WHERE clipboard_id = ?");
+                $stmt->execute([$_FILES['file']['name'], $filePath, $clipboard_id]);
+                echo json_encode(['success' => true]);
+            } else {
+                echo json_encode(['success' => false, 'error' => 'File upload failed']);
+            }
+        }
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+    }
+    exit;
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Clipboard | Content</title>
+    <link rel="stylesheet" href="./style/style.css">
+    <link rel="icon" href="./asset/fav.png" type="image/png">
+</head>
+
+<body>
+    <header>
+        <nav class="section-wide" id="marTop">
+            <div class="logo">
+                <figure>
+                    <a href="./index.php"><img src="./asset/logo.png" alt="Logo"></a>
+                </figure>
+                <span class="logo-text">Cloud Clipboard</span>
+            </div>
+            <div class="secret-code">
+                <p><?php echo htmlspecialchars($clipboard_id); ?></p>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <?php if ($error): ?>
+        <div class="error"><?php echo $error; ?></div>
+        <?php else: ?>
+        <section class="section-wide attachment-section">
+            <div class="text-container">
+                <textarea id="textArea" cols="auto" rows="" placeholder="Type or paste text here..."><?php 
+                        if ($clipboard_data && $clipboard_data['content_type'] === 'text') {
+                            echo htmlspecialchars($clipboard_data['content_text']);
+                        }
+                    ?></textarea>
+            </div>
+
+            <div class="file-container">
+                <input type="file" id="fileInput" style="display: none;">
+                <button onclick="document.getElementById('fileInput').click()">Upload File</button>
+
+                <?php if ($clipboard_data && $clipboard_data['content_type'] === 'file'): ?>
+                <div class="file-display">
+                    <p>File: <?php echo htmlspecialchars($clipboard_data['file_name']); ?></p>
+                    <a href="<?php echo htmlspecialchars($clipboard_data['file_path']); ?>" download>Download</a>
+                </div>
+                <?php endif; ?>
+            </div>
+        </section>
+        <?php endif; ?>
+    </main>
+
+    <script>
+    const textArea = document.getElementById('textArea');
+    const fileInput = document.getElementById('fileInput');
+    const clipboardId = '<?php echo $clipboard_id; ?>';
+
+    // Auto-save text
+    textArea.addEventListener('input', () => {
+        const formData = new FormData();
+        formData.append('text', textArea.value);
+        formData.append('clipboard_id', clipboardId);
+
+        fetch('', {
+            method: 'POST',
+            body: formData
+        });
+    });
+
+    // Handle file upload
+    fileInput.addEventListener('change', () => {
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+        formData.append('clipboard_id', clipboardId);
+
+        fetch('', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload(); // Reload to show the uploaded file
+                }
+            });
+    });
+    </script>
+</body>
+
+</html>
