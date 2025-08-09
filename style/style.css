@@ -179,7 +179,8 @@ ul img:hover {
   transition: background-color 0.3s ease, transform 0.3s ease;
 }
 .input-container {
-  display: flex;
+  /* display: flex; */
+  position: relative;
 }
 .input-container input {
   width: 250px;
@@ -344,6 +345,16 @@ textarea:focus {
   color: white;
   font-size: 1.25rem;
   cursor: pointer;
+}
+form{
+  display: flex;
+}
+#error-message{
+  color: #1e3e62;
+  font-size: 1rem;
+  position: absolute;
+  bottom: -40px;
+  left: 50px;
 }
 
 /* Responsive Design */

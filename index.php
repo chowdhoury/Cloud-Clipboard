@@ -1,118 +1,141 @@
 <?php
-function generateCode($length = 5) {
-    return substr(str_shuffle("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, $length);
-}
+    $error              = "";
+    $clipboard_id_value = "";
 
-function cleanExpiredEntries($directory, $expiryTime) {
-    foreach (glob($directory . "*") as $file) {
-        if (filemtime($file) < time() - $expiryTime) {
-            unlink($file);
+    if ($_SERVER["REQUEST_METHOD"] === "POST") {
+        // Handle generate button
+        if (isset($_POST['generate'])) {
+            // Generate a random 6-digit number with leading zeros if needed
+            $clipboard_id_value = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+            
+            header("Location: content.php?clipboard_id=" . urlencode($clipboard_id_value));
+            exit;
+        }
+        
+        // Handle join button
+        if (isset($_POST["clipboard_id"]) && !empty($_POST["clipboard_id"])) {
+            $clipboard_id_value = $_POST["clipboard_id"];
+
+            // Check if it is exactly 6 digits
+            if (!preg_match('/^\d{6}$/', $clipboard_id_value)) {
+                $error = "Invalid ID. Must be a 6-digit number.";
+            } else {
+                // Redirect to content.php with the clipboard ID
+                header("Location: content.php?clipboard_id=" . urlencode($clipboard_id_value));
+                exit;
+            }
+        } else {
+            $error = "Please enter a clipboard ID.";
         }
     }
-}
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $response = [];
-
-    // Handle text submission
-    if (isset($_POST['text'])) {
-        $text = $_POST['text'];
-        $uploadText = "uploads_text/";
-        if (!is_dir($uploadText)) mkdir($uploadText, 0777, true);
-
-        $code = generateCode();
-        $textFile = $uploadText . $code . ".txt";
-        file_put_contents($textFile, $text);
-
-        $response['code'] = $code;
-        $response['type'] = 'text';
-    }
-
-    // Handle file submission
-    if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
-        $uploadImage = "uploads_image/";
-        if (!is_dir($uploadImage)) mkdir($uploadImage, 0777, true);
-
-        $code = generateCode();
-        $fileName = $code . "_" . basename($_FILES['image']['name']);
-        $imagePath = $uploadImage . $fileName;
-        move_uploaded_file($_FILES['image']['tmp_name'], $imagePath);
-
-        $response['code'] = $code;
-        $response['type'] = 'file';
-    }
-
-    // Clean expired entries (24 hours = 86400 seconds)
-    cleanExpiredEntries("uploads_text/", 86400);
-    cleanExpiredEntries("uploads_image/", 86400);
-
-    echo json_encode($response);
-    exit;
-}
-
-if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['code'])) {
-    $code = $_GET['code'];
-    $textFile = "uploads_text/" . $code . ".txt";
-    $imageFiles = glob("uploads_image/" . $code . "_*");
-
-    if (file_exists($textFile)) {
-        // Correctly retrieve and display text content
-        header('Content-Type: text/plain');
-        echo file_get_contents($textFile);
-    } elseif (!empty($imageFiles)) {
-        $imagePath = $imageFiles[0];
-        echo "<img src='$imagePath' alt='Uploaded Image' style='max-width:100%;'>";
-    } else {
-        echo "No content found for the provided code.";
-    }
-    exit;
-}
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Store Text or File</title>
-    <link rel="stylesheet" href="style.css">
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const textArea = document.querySelector('textarea[name="text"]');
-            const fileInput = document.querySelector('input[name="image"]');
-            const form = document.querySelector('form');
-            const resultDiv = document.querySelector('#result');
-
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const formData = new FormData(form);
-
-                fetch('', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.code) {
-                        resultDiv.innerHTML = `Your code is: <strong>${data.code}</strong>. Use this code to retrieve your content.`;
-                    }
-                });
-            });
-        });
-    </script>
+    <title>Cloud Clipboard | Online Clipboard for Instant Text & Image Sharing | Collaborative Board</title>
+    <link rel="stylesheet" href="./style/style.css">
+    <link rel="icon" href="./asset/fav.png" type="image/png">
 </head>
+
 <body>
-    <h1>Store Text or File</h1>
-    <form action="" method="POST" enctype="multipart/form-data">
-        <textarea name="text" cols="30" rows="10" placeholder="Enter your text"></textarea><br>
-        <input type="file" name="image"><br>
-        <button type="submit">Submit</button>
-    </form>
-    <div id="result"></div>
-    <h2>Retrieve Content</h2>
-    <form action="" method="GET">
-        <input type="text" name="code" placeholder="Enter your code">
-        <button type="submit">Retrieve</button>
-    </form>
+    <header>
+        <ul class="mobile-menu">
+            <li class="control">
+                <div>
+                    <img onclick="closeMenu()" src="./asset/close_menu.svg" alt="close Menu">
+                </div>
+                <div>
+                    <img class="rotateImg" src="./asset/mode.svg" alt="mode">
+            </li>
+            </div>
+            <li onclick="closeMenu()"><a href="#">Home</a></li>
+            <li onclick="closeMenu()"><a href="#">About</a></li>
+            <li onclick="closeMenu()"><a href="#">Updates</a></li>
+            <li onclick="closeMenu()"><a href="#">Feedback</a></li>
+        </ul>
+        <nav class="section-wide" id="marTop">
+            <img onclick="toggleMenu()" src="./asset/menu.svg" alt="menu Icon" class="menu-icon">
+            <div class="logo">
+                <figure>
+                    <a href="./index.php"><img src="./asset/logo.png" alt="Logo"></a>
+                </figure>
+                <span class="logo-text">Cloud Clipboard</span>
+            </div>
+            <ul class="mobile-menu">
+                <li class="control">
+                    <div>
+                        <img src="./asset/close_menu.svg" alt="close Menu">
+                    </div>
+                    <div>
+                        <img class="rotateImg" src="./asset/mode.svg" alt="mode">
+                </li>
+                </div>
+                <li><a href="./index.php">Home</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Updates</a></li>
+                <li><a href="#">Feedback</a></li>
+            </ul>
+            <ul class="nav-links">
+                <li><img class="rotateImg" src="./asset/mode.svg" alt="mode"></li>
+                <li><a href="./index.php">Home</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Updates</a></li>
+                <li><a href="#">Feedback</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main id="mainContent">
+        <section class="section-wide image-section">
+            <!-- <img src="./asset/clipboard.webp" alt=""> -->
+            <script src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.6.2/dist/dotlottie-wc.js" type="module"></script>
+            <dotlottie-wc src="https://lottie.host/c7363849-bc39-47c9-88f2-4bc27afb42cf/UVGh4V7fib.lottie"
+                style="max-width: 400px;height: 400px" speed="1" autoplay loop></dotlottie-wc>
+        </section>
+        <section class="section-wide functional-section">
+            <div class="text-section">
+                <h1>Cloud Clipboard</h1>
+                <p>Share text and images instantly with Cloud Clipboard. No sign-up required, just copy and paste!</p>
+            </div>
+            <div class="functional-buttons">
+                <div>
+                    <p>Create a new Clipboard...</p>
+                    <form method="post" action="">
+                        <button type="submit" class="primary-button" name="generate">Create Clipboard</button>
+                    </form>
+                </div>
+                <div>
+                    <p>Join an existing Clipboard...</p>
+                    <div class="input-container">
+                        <form action="" method="post">
+                            <input type="text" name="clipboard_id" placeholder="Enter Clipboard ID"
+                                value="<?php echo htmlspecialchars($clipboard_id_value); ?>" required>
+                            <button class="secondary-button">Join</button>
+                        </form>
+
+                        <p class="error-message" id="error-message"
+                            style="display: <?php echo $error ? 'block' : 'none'; ?>;">
+                            <?php echo $error; ?>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer class="section-wide section-top">
+        <ul class="footer-links">
+            <li><a href="#">About</a></li>
+            <li class="borderLeft"><a href="#">Privacy Policy</a></li>
+            <li class="borderLeft"><a href="#">Terms of Service</a></li>
+            <li class="borderLeft"><a href="#">Contact Us</a></li>
+        </ul>
+        <hr>
+        <p><small>&copy; 2025 Cloud Clipboard. All rights reserved.</small></p>
+    </footer>
+    <script src="./script/header-script.js"></script>
 </body>
+
 </html>
